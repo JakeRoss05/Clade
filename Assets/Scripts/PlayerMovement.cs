@@ -4,8 +4,16 @@ using UnityEngine.InputSystem;
 public class PlayerMovement : MonoBehaviour
 {
     [Header("Evolution Stats")]
+    private PlayerMovement playerMovement;
     public float baseSpeed = 5f;
     public float sizeMultiplier = 1f;
+
+    [Header("Boost")]
+    public float boostMultiplier = 2f;
+    public float boostEnergyCostPerSecond = 10f;
+
+    private bool isBoosting;
+    private Energy energy;
 
 
     private PlayerInputActions input;
@@ -33,19 +41,24 @@ public class PlayerMovement : MonoBehaviour
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
+        energy = GetComponent<Energy>();
     }
 
     private void FixedUpdate()
     {
+        isBoosting = Keyboard.current.leftShiftKey.isPressed;
         Vector3 movement = new Vector3(moveInput.x, 0f, moveInput.y);
 
         if (movement != Vector3.zero)
         {
-            Quaternion targetRotation = Quaternion.LookRotation(movement);
-            rb.MovePosition(
-            rb.position + movement * (baseSpeed / sizeMultiplier) * Time.fixedDeltaTime
-            );
+            float currentSpeed = baseSpeed / sizeMultiplier;
+            if (Keyboard.current.leftShiftKey.isPressed && energy != null && energy.currentEnergy > 0)
+            {
+                currentSpeed *= boostMultiplier;
+                energy.currentEnergy -= boostEnergyCostPerSecond * Time.fixedDeltaTime;
+            }
 
+            rb.MovePosition(rb.position + movement.normalized * currentSpeed * Time.fixedDeltaTime);
         }
 
         transform.localScale = Vector3.one * sizeMultiplier;
