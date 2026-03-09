@@ -42,7 +42,8 @@ public class PlayerShield : MonoBehaviour
     void DisableShield()
     {
         shieldActive = false;
-        shieldVisual.SetActive(false);
+        if (shieldVisual != null)
+            shieldVisual.SetActive(false);
     }
 
     public void Unlock()
