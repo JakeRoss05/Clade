@@ -9,6 +9,7 @@ public class PlayerLevel : MonoBehaviour
 
     public PlayerHealth playerHealth;
     public PlayerShield playerShield;
+    public PlayerCombat playerCombat;
 
     public Transform playerModel;
 
@@ -42,13 +43,36 @@ public class PlayerLevel : MonoBehaviour
             GrowPlayer();
             IncreaseHealth();
         }
+        else if (level == 3)
+        {
+            UnlockCombat();
+            UpgradeShield();
+            GrowPlayer();
+            IncreaseHealth();
+        }
     }
 
     void UnlockShield()
     {
         if (playerShield != null)
         {
-            playerShield.Unlock();
+            playerShield.Unlock(); // Gives 1 charge
+        }
+    }
+
+    void UnlockCombat()
+    {
+        if (playerCombat != null)
+        {
+            playerCombat.Unlock();
+        }
+    }
+
+    void UpgradeShield()
+    {
+        if (playerShield != null)
+        {
+            playerShield.UpgradeCharges(3); // Upgrade to 3 charges at level 3
         }
     }
 

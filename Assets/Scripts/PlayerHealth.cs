@@ -9,11 +9,13 @@ public class PlayerHealth : MonoBehaviour
     public float healthFromFood = 10f;
 
     private PlayerMovement playerMovement;
+    private PlayerShield playerShield;
 
     void Start()
     {
         currentHealth = maxHealth;
         playerMovement = GetComponent<PlayerMovement>();
+        playerShield = GetComponent<PlayerShield>();
     }
 
     void Update()
@@ -41,6 +43,13 @@ public class PlayerHealth : MonoBehaviour
 
     public void TakeDamage(float damage)
     {
+        // Shield reduces damage by 75%
+        if (playerShield != null && playerShield.shieldActive)
+        {
+            damage *= 0.25f;
+            Debug.Log("Shield reduced the hit! Damage taken: " + damage);
+        }
+
         currentHealth -= damage;
         currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth);
 
