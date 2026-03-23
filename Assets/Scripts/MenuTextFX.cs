@@ -11,6 +11,7 @@ public class MenuTextFX : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 
     public Color hoverColor = new Color(0.8f, 0.9f, 1f);
     public float hoverScale = 1.08f;
+    
     void Start()
     {
         originalScale = transform.localScale;
