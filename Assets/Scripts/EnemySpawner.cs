@@ -60,6 +60,6 @@ public class EnemySpawner : MonoBehaviour
         Vector3 spawnPosition = transform.position + Random.insideUnitSphere * spawnRadius;
         spawnPosition.y = 0;
 
-        Instantiate(enemyToSpawn, spawnPosition, Quaternion.identity);
+        Instantiate(enemyToSpawn, spawnPosition, Quaternion.identity); 
     }
 }
