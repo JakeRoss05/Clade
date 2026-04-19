@@ -10,7 +10,7 @@ public class WindowControls : MonoBehaviour
 
     void Start()
     {
-        taskbar = FindObjectOfType<TaskbarManager>();
+        taskbar = FindFirstObjectByType<TaskbarManager>();
     }
 
     public void Close()

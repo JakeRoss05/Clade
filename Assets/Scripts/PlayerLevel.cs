@@ -13,6 +13,12 @@ public class PlayerLevel : MonoBehaviour
 
     public Transform playerModel;
 
+    [Header("Level 3 Upgrade Choice")]
+    public GameObject level3ChoiceWindow;
+    public bool pauseGameWhenChoosing = true;
+
+    private bool isAwaitingLevel3Choice;
+
     public void AddFood(int amount)
     {
         foodCollected += amount;
@@ -45,11 +51,27 @@ public class PlayerLevel : MonoBehaviour
         }
         else if (level == 3)
         {
-            UnlockCombat();
-            UpgradeShield();
+            ShowLevel3ChoiceWindow();
             GrowPlayer();
             IncreaseHealth();
         }
+    }
+
+    void ShowLevel3ChoiceWindow()
+    {
+        isAwaitingLevel3Choice = true;
+
+        if (level3ChoiceWindow != null)
+        {
+            level3ChoiceWindow.SetActive(true);
+        }
+
+        if (pauseGameWhenChoosing)
+        {
+            Time.timeScale = 0f;
+        }
+
+        Debug.Log("Level 3 reached! Waiting for player upgrade choice.");
     }
 
     void UnlockShield()
@@ -73,6 +95,47 @@ public class PlayerLevel : MonoBehaviour
         if (playerShield != null)
         {
             playerShield.UpgradeCharges(3); // Upgrade to 3 charges at level 3
+        }
+    }
+
+    public void ChooseCombatUnlock()
+    {
+        if (!isAwaitingLevel3Choice)
+            return;
+
+        UnlockCombat();
+        CompleteLevel3Choice();
+    }
+
+    public void ChooseShieldUpgrade()
+    {
+        if (!isAwaitingLevel3Choice)
+            return;
+
+        UpgradeShield();
+        CompleteLevel3Choice();
+    }
+
+    void CompleteLevel3Choice()
+    {
+        isAwaitingLevel3Choice = false;
+
+        if (level3ChoiceWindow != null)
+        {
+            level3ChoiceWindow.SetActive(false);
+        }
+
+        if (pauseGameWhenChoosing)
+        {
+            Time.timeScale = 1f;
+        }
+    }
+
+    void OnDisable()
+    {
+        if (pauseGameWhenChoosing && Time.timeScale == 0f)
+        {
+            Time.timeScale = 1f;
         }
     }
 

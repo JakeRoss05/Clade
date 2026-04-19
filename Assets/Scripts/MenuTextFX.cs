@@ -32,13 +32,6 @@ public class MenuTextFX : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        StartCoroutine(ClickAnim());
-    }
-
-    System.Collections.IEnumerator ClickAnim()
-    {
-        transform.localScale = originalScale * 0.9f;
-        yield return new WaitForSeconds(0.05f);
         transform.localScale = originalScale;
     }
 }
