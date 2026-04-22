@@ -19,6 +19,16 @@ public class PlayerLevel : MonoBehaviour
 
     private bool isAwaitingLevel3Choice;
 
+    void Start()
+    {
+        isAwaitingLevel3Choice = false;
+
+        if (level3ChoiceWindow != null)
+        {
+            level3ChoiceWindow.SetActive(false);
+        }
+    }
+
     public void AddFood(int amount)
     {
         foodCollected += amount;
