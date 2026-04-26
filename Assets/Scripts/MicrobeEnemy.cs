@@ -9,7 +9,7 @@ public class MicrobeEnemy : MonoBehaviour
     public float speed = 2f;
     public float detectionRange = 10f;
     public float wanderSpeed = 1f;
-    public float damage = 5f;
+    public float damage = 5.5f;
     public float attackCooldown = 1f;
     public float health = 20f;
 
@@ -39,17 +39,17 @@ public class MicrobeEnemy : MonoBehaviour
         switch (tier)
         {
             case EnemyTier.Weak:
-                damage = 5f;
+                damage = 5.5f;
                 health = 20f;
                 speed = 2f;
                 break;
             case EnemyTier.Medium:
-                damage = 10f;
+                damage = 11f;
                 health = 40f;
                 speed = 3f;
                 break;
             case EnemyTier.Max:
-                damage = 20f;
+                damage = 22f;
                 health = 80f;
                 speed = 4f;
                 break;
