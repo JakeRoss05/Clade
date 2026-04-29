@@ -1,5 +1,6 @@
+using System.Collections;
 using UnityEngine;
-using UnityEngine.InputSystem;
+using UnityEngine.EventSystems;
 
 public class PlayerCombat : MonoBehaviour
 {
@@ -10,50 +11,119 @@ public class PlayerCombat : MonoBehaviour
     public float attackCooldown = 0.5f;
     public int shieldChargesPerKill = 1;
 
+    [Header("Attack Windup")]
+    public float attackWindupTime = 0.2f;
+    public Animator combatAnimator;
+    public string attackTriggerName = "Attack";
+
     private float lastAttackTime;
     private PlayerShield playerShield;
+    private bool isWindingUp;
 
     void Start()
     {
         playerShield = GetComponent<PlayerShield>();
+        EnsureCameraRaycaster();
     }
 
-    void Update()
+    public bool TryAttackTarget(MicrobeEnemy target)
+    {
+        if (!CanAttackTarget(target))
+            return false;
+
+        lastAttackTime = Time.time;
+        StartCoroutine(WindupAndAttack(target));
+
+        return true;
+    }
+
+    public bool CanAttackTarget(MicrobeEnemy target)
     {
         if (!combatUnlocked)
-            return;
+            return false;
 
-        if (Mouse.current.leftButton.wasPressedThisFrame && Time.time - lastAttackTime >= attackCooldown)
-        {
-            Attack();
-            lastAttackTime = Time.time;
-        }
+        if (target == null)
+            return false;
+
+        if (isWindingUp)
+            return false;
+
+        if (Time.time - lastAttackTime < attackCooldown)
+            return false;
+
+        float distanceToTarget = Vector3.Distance(transform.position, target.transform.position);
+        return distanceToTarget <= attackRange;
     }
 
-    void Attack()
+    IEnumerator WindupAndAttack(MicrobeEnemy target)
     {
-        Debug.Log("Player attacks!");
+        isWindingUp = true;
 
-        Collider[] hits = Physics.OverlapSphere(transform.position, attackRange);
-        foreach (Collider hit in hits)
+        if (combatAnimator != null && !string.IsNullOrEmpty(attackTriggerName))
         {
-            MicrobeEnemy enemy = hit.GetComponent<MicrobeEnemy>();
-            if (enemy != null)
-            {
-                enemy.TakeDamage(attackDamage);
-
-                // If the enemy dies from this hit, refill shield charges
-                if (enemy.health <= 0 && playerShield != null)
-                {
-                    playerShield.RefillCharges(shieldChargesPerKill);
-                }
-            }
+            combatAnimator.SetTrigger(attackTriggerName);
         }
+
+        float elapsed = 0f;
+        while (elapsed < attackWindupTime)
+        {
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        if (target == null)
+        {
+            isWindingUp = false;
+            yield break;
+        }
+
+        float distanceToTarget = Vector3.Distance(transform.position, target.transform.position);
+        if (distanceToTarget > attackRange)
+        {
+            isWindingUp = false;
+            yield break;
+        }
+
+        Debug.Log("Player attacks " + target.name + "!");
+
+        float targetHealthBeforeHit = target.health;
+        target.TakeDamage(attackDamage);
+
+        if (targetHealthBeforeHit > 0f && target.health <= 0f && playerShield != null)
+        {
+            playerShield.RefillCharges(shieldChargesPerKill);
+        }
+
+        isWindingUp = false;
     }
 
     public void Unlock()
     {
         combatUnlocked = true;
         Debug.Log("Combat ability unlocked!");
+    }
+
+    public bool IsAttackCoolingDown()
+    {
+        return combatUnlocked && Time.time - lastAttackTime < attackCooldown;
+    }
+
+    public float GetAttackCooldownRemaining()
+    {
+        if (!combatUnlocked)
+            return 0f;
+
+        float remaining = attackCooldown - (Time.time - lastAttackTime);
+        return Mathf.Max(0f, remaining);
+    }
+
+    void EnsureCameraRaycaster()
+    {
+        Camera mainCamera = Camera.main;
+        if (mainCamera == null)
+            return;
+
+        if (mainCamera.GetComponent<PhysicsRaycaster>() == null)
+            mainCamera.gameObject.AddComponent<PhysicsRaycaster>();
     }
 }

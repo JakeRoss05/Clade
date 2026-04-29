@@ -7,36 +7,56 @@ public class Food : MonoBehaviour
     public float sizeIncrease = 0.1f;
     public int xpvalue = 1;
 
+    private bool consumed;
+
     private void OnTriggerEnter(Collider other)
     {
-        if (!other.CompareTag("Player")) return;
+        TryConsume(other);
+    }
 
-        Energy energy = other.GetComponent<Energy>();
+    private void OnCollisionEnter(Collision collision)
+    {
+        TryConsume(collision.collider);
+    }
+
+    private void TryConsume(Collider other)
+    {
+        if (consumed || other == null)
+            return;
+
+        Energy energy = other.GetComponentInParent<Energy>();
+        PlayerHealth health = other.GetComponentInParent<PlayerHealth>();
+        PlayerLevel level = other.GetComponentInParent<PlayerLevel>();
+        PlayerMovement player = other.GetComponentInParent<PlayerMovement>();
+
+        // Treat an object as the player if any core player gameplay component exists on it.
+        if (energy == null && health == null && level == null && player == null)
+            return;
+
+        consumed = true;
+
         if (energy != null)
         {
             energy.AddEnergy(energyValue);
         }
 
-        PlayerHealth health = other.GetComponent<PlayerHealth>();
         if (health != null)
         {
-            health.Heal(energyValue);
+            float healAmount = health.healthFromFood > 0f ? health.healthFromFood : energyValue;
+            health.Heal(healAmount);
         }
 
-        PlayerLevel level = other.GetComponent<PlayerLevel>();
         if (level != null)
         {
             level.AddFood(xpvalue);
         }
 
-        PlayerMovement player = other.GetComponent<PlayerMovement>();
         if (player != null)
         {
             player.sizeMultiplier += sizeIncrease;
         }
 
         Destroy(gameObject);
-
     }
 }
 
