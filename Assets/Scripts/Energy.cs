@@ -6,6 +6,9 @@ public class Energy : MonoBehaviour
     public float maxEnergy = 100f;
     public float currentEnergy = 50f;
 
+    [Header("Boost Efficiency")]
+    public float boostEnergyCostMultiplier = 1f;
+
     [Header("Food Absorption")]
     public bool absorbFoodUnlocked = false;
     public float absorbRange = 3f;
@@ -31,10 +34,34 @@ public class Energy : MonoBehaviour
         currentEnergy = Mathf.Clamp(currentEnergy, 0f, maxEnergy);
     }
 
+    public void IncreaseMaxEnergy(float amount)
+    {
+        maxEnergy += amount;
+        currentEnergy = Mathf.Clamp(currentEnergy + amount, 0f, maxEnergy);
+    }
+
+    public void ImproveBoostEfficiency(float multiplier)
+    {
+        boostEnergyCostMultiplier = Mathf.Max(0.1f, boostEnergyCostMultiplier * multiplier);
+        Debug.Log("Boost efficiency improved! Multiplier: " + boostEnergyCostMultiplier);
+    }
+
     public void UnlockFoodAbsorb()
     {
         absorbFoodUnlocked = true;
         Debug.Log("Food absorption ability unlocked!");
+
+        if (absorbRange < 4.5f)
+        {
+            absorbRange = 4.5f;
+        }
+    }
+
+    public void ImproveFoodAbsorb(float rangeIncrease)
+    {
+        absorbFoodUnlocked = true;
+        absorbRange += rangeIncrease;
+        Debug.Log("Food absorption improved! Range: " + absorbRange);
     }
 
     void AbsorbNearbyFood()

@@ -54,7 +54,7 @@ public class PlayerMovement : MonoBehaviour
             if (Keyboard.current.leftShiftKey.isPressed && energy != null && energy.currentEnergy > 0)
             {
                 currentSpeed *= boostMultiplier;
-                energy.currentEnergy -= boostEnergyCostPerSecond * Time.fixedDeltaTime;
+                energy.currentEnergy -= boostEnergyCostPerSecond * energy.boostEnergyCostMultiplier * Time.fixedDeltaTime;
             }
 
             rb.MovePosition(rb.position + movement.normalized * currentSpeed * Time.fixedDeltaTime);

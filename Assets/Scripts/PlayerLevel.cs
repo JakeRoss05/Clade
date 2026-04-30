@@ -7,6 +7,7 @@ public class PlayerLevel : MonoBehaviour
     public int foodCollected = 0;
     public int foodToLevelUp = 5;
 
+    public Energy playerEnergy;
     public PlayerHealth playerHealth;
     public PlayerShield playerShield;
     public PlayerCombat playerCombat;
@@ -15,17 +16,33 @@ public class PlayerLevel : MonoBehaviour
 
     [Header("Level 3 Upgrade Choice")]
     public GameObject level3ChoiceWindow;
-    public bool pauseGameWhenChoosing = true;
+    public bool pauseGameWhenChoosingLevel3 = true;
+
+    [Header("Level 4 Upgrade Choice")]
+    public GameObject level4ChoiceWindow;
+    public bool pauseGameWhenChoosingLevel4 = true;
 
     private bool isAwaitingLevel3Choice;
+    private bool isAwaitingLevel4Choice;
 
     void Start()
     {
         isAwaitingLevel3Choice = false;
+        isAwaitingLevel4Choice = false;
+
+        if (playerEnergy == null)
+        {
+            playerEnergy = GetComponent<Energy>();
+        }
 
         if (level3ChoiceWindow != null)
         {
             level3ChoiceWindow.SetActive(false);
+        }
+
+        if (level4ChoiceWindow != null)
+        {
+            level4ChoiceWindow.SetActive(false);
         }
     }
 
@@ -65,6 +82,12 @@ public class PlayerLevel : MonoBehaviour
             GrowPlayer();
             IncreaseHealth();
         }
+        else if (level == 4)
+        {
+            ShowLevel4ChoiceWindow();
+            GrowPlayer();
+            IncreaseHealth();
+        }
     }
 
     void ShowLevel3ChoiceWindow()
@@ -76,12 +99,29 @@ public class PlayerLevel : MonoBehaviour
             level3ChoiceWindow.SetActive(true);
         }
 
-        if (pauseGameWhenChoosing)
+        if (ShouldPauseForLevel3())
         {
             Time.timeScale = 0f;
         }
 
         Debug.Log("Level 3 reached! Waiting for player upgrade choice.");
+    }
+
+    void ShowLevel4ChoiceWindow()
+    {
+        isAwaitingLevel4Choice = true;
+
+        if (level4ChoiceWindow != null)
+        {
+            level4ChoiceWindow.SetActive(true);
+        }
+
+        if (ShouldPauseForLevel4())
+        {
+            Time.timeScale = 0f;
+        }
+
+        Debug.Log("Level 4 reached! Waiting for player upgrade choice.");
     }
 
     void UnlockShield()
@@ -108,6 +148,24 @@ public class PlayerLevel : MonoBehaviour
         }
     }
 
+    void UpgradeEnergyCapacity()
+    {
+        if (playerEnergy != null)
+        {
+            playerEnergy.IncreaseMaxEnergy(25f);
+            playerEnergy.ImproveBoostEfficiency(0.8f);
+        }
+    }
+
+    void UnlockFoodAbsorption()
+    {
+        if (playerEnergy != null)
+        {
+            playerEnergy.UnlockFoodAbsorb();
+            playerEnergy.ImproveFoodAbsorb(1.5f);
+        }
+    }
+
     public void ChooseCombatUnlock()
     {
         if (!isAwaitingLevel3Choice)
@@ -126,6 +184,24 @@ public class PlayerLevel : MonoBehaviour
         CompleteLevel3Choice();
     }
 
+    public void ChooseEnergyUpgrade()
+    {
+        if (!isAwaitingLevel4Choice)
+            return;
+
+        UpgradeEnergyCapacity();
+        CompleteLevel4Choice();
+    }
+
+    public void ChooseFoodAbsorbUpgrade()
+    {
+        if (!isAwaitingLevel4Choice)
+            return;
+
+        UnlockFoodAbsorption();
+        CompleteLevel4Choice();
+    }
+
     void CompleteLevel3Choice()
     {
         isAwaitingLevel3Choice = false;
@@ -135,7 +211,22 @@ public class PlayerLevel : MonoBehaviour
             level3ChoiceWindow.SetActive(false);
         }
 
-        if (pauseGameWhenChoosing)
+        if (ShouldPauseForLevel3())
+        {
+            Time.timeScale = 1f;
+        }
+    }
+
+    void CompleteLevel4Choice()
+    {
+        isAwaitingLevel4Choice = false;
+
+        if (level4ChoiceWindow != null)
+        {
+            level4ChoiceWindow.SetActive(false);
+        }
+
+        if (ShouldPauseForLevel4())
         {
             Time.timeScale = 1f;
         }
@@ -143,10 +234,20 @@ public class PlayerLevel : MonoBehaviour
 
     void OnDisable()
     {
-        if (pauseGameWhenChoosing && Time.timeScale == 0f)
+        if ((ShouldPauseForLevel3() || ShouldPauseForLevel4()) && Time.timeScale == 0f)
         {
             Time.timeScale = 1f;
         }
+    }
+
+    bool ShouldPauseForLevel3()
+    {
+        return pauseGameWhenChoosingLevel3;
+    }
+
+    bool ShouldPauseForLevel4()
+    {
+        return pauseGameWhenChoosingLevel4;
     }
 
     void GrowPlayer()

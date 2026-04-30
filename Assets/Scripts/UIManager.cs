@@ -58,6 +58,7 @@ public class UIManager : MonoBehaviour
 
     [Header("Unlock Notification")]
     public GameObject shieldUnlockNotification;
+    public GameObject combatUnlockNotification;
     public float notificationVisibleDuration = 3f;
     public float notificationFadeDuration = 0.5f;
 
@@ -70,10 +71,12 @@ public class UIManager : MonoBehaviour
     private bool hasShownShieldPrompt;
     private bool isShieldPromptRunning;
     private bool isShieldUnlockNotificationRunning;
+    private bool isCombatUnlockNotificationRunning;
     private Transform playerTransform;
     private RectTransform shieldPromptRect;
     private CanvasGroup shieldPromptGroup;
     private CanvasGroup shieldUnlockNotificationGroup;
+    private CanvasGroup combatUnlockNotificationGroup;
     private Camera mainCam;
 
     void Awake()
@@ -149,6 +152,16 @@ public class UIManager : MonoBehaviour
             shieldUnlockNotification.SetActive(false);
         }
 
+        if (combatUnlockNotification != null)
+        {
+            combatUnlockNotificationGroup = combatUnlockNotification.GetComponent<CanvasGroup>();
+            if (combatUnlockNotificationGroup == null)
+                combatUnlockNotificationGroup = combatUnlockNotification.gameObject.AddComponent<CanvasGroup>();
+
+            combatUnlockNotificationGroup.alpha = 0f;
+            combatUnlockNotification.SetActive(false);
+        }
+
         if (energySlider == null)
             energySlider = transform.Find("EnergyBar")?.GetComponent<Slider>();
         if (foodSlider == null)
@@ -160,6 +173,8 @@ public class UIManager : MonoBehaviour
             shieldChargePanel.SetActive(false);
         if (shieldUnlockNotification != null)
             shieldUnlockNotification.SetActive(false);
+        if (combatUnlockNotification != null)
+            combatUnlockNotification.SetActive(false);
     }
 
     void Update()
@@ -374,6 +389,14 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    public void ShowCombatUnlockNotification()
+    {
+        if (combatUnlockNotification == null || combatUnlockNotificationGroup == null || isCombatUnlockNotificationRunning)
+            return;
+
+        StartCoroutine(PlayCombatUnlockNotificationPopup());
+    }
+
     void UpdateShieldPromptPosition()
     {
         if (shieldPrompt == null || !shieldPrompt.gameObject.activeSelf)
@@ -494,5 +517,47 @@ public class UIManager : MonoBehaviour
         shieldUnlockNotificationGroup.alpha = 0f;
         shieldUnlockNotification.SetActive(false);
         isShieldUnlockNotificationRunning = false;
+    }
+
+    IEnumerator PlayCombatUnlockNotificationPopup()
+    {
+        if (combatUnlockNotification == null || combatUnlockNotificationGroup == null)
+            yield break;
+
+        isCombatUnlockNotificationRunning = true;
+
+        combatUnlockNotification.SetActive(true);
+        combatUnlockNotificationGroup.alpha = 0f;
+
+        float elapsed = 0f;
+        while (elapsed < notificationFadeDuration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float t = Mathf.Clamp01(elapsed / notificationFadeDuration);
+            combatUnlockNotificationGroup.alpha = Mathf.Lerp(0f, 1f, t);
+            yield return null;
+        }
+
+        combatUnlockNotificationGroup.alpha = 1f;
+
+        elapsed = 0f;
+        while (elapsed < notificationVisibleDuration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            yield return null;
+        }
+
+        elapsed = 0f;
+        while (elapsed < notificationFadeDuration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float t = Mathf.Clamp01(elapsed / notificationFadeDuration);
+            combatUnlockNotificationGroup.alpha = Mathf.Lerp(1f, 0f, t);
+            yield return null;
+        }
+
+        combatUnlockNotificationGroup.alpha = 0f;
+        combatUnlockNotification.SetActive(false);
+        isCombatUnlockNotificationRunning = false;
     }
 }

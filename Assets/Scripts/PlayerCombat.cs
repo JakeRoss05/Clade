@@ -101,6 +101,11 @@ public class PlayerCombat : MonoBehaviour
     {
         combatUnlocked = true;
         Debug.Log("Combat ability unlocked!");
+
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.ShowCombatUnlockNotification();
+        }
     }
 
     public bool IsAttackCoolingDown()
