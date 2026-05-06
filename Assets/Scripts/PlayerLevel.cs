@@ -22,13 +22,19 @@ public class PlayerLevel : MonoBehaviour
     public GameObject level4ChoiceWindow;
     public bool pauseGameWhenChoosingLevel4 = true;
 
+    [Header("Level 5 Upgrade Choice")]
+    public GameObject level5ChoiceWindow;
+    public bool pauseGameWhenChoosingLevel5 = true;
+
     private bool isAwaitingLevel3Choice;
     private bool isAwaitingLevel4Choice;
+    private bool isAwaitingLevel5Choice;
 
     void Start()
     {
         isAwaitingLevel3Choice = false;
         isAwaitingLevel4Choice = false;
+        isAwaitingLevel5Choice = false;
 
         if (playerEnergy == null)
         {
@@ -43,6 +49,11 @@ public class PlayerLevel : MonoBehaviour
         if (level4ChoiceWindow != null)
         {
             level4ChoiceWindow.SetActive(false);
+        }
+
+        if (level5ChoiceWindow != null)
+        {
+            level5ChoiceWindow.SetActive(false);
         }
     }
 
@@ -88,6 +99,12 @@ public class PlayerLevel : MonoBehaviour
             GrowPlayer();
             IncreaseHealth();
         }
+        else if (level == 5)
+        {
+            ShowLevel5ChoiceWindow();
+            GrowPlayer();
+            IncreaseHealth();
+        }
     }
 
     void ShowLevel3ChoiceWindow()
@@ -122,6 +139,23 @@ public class PlayerLevel : MonoBehaviour
         }
 
         Debug.Log("Level 4 reached! Waiting for player upgrade choice.");
+    }
+
+    void ShowLevel5ChoiceWindow()
+    {
+        isAwaitingLevel5Choice = true;
+
+        if (level5ChoiceWindow != null)
+        {
+            level5ChoiceWindow.SetActive(true);
+        }
+
+        if (ShouldPauseForLevel5())
+        {
+            Time.timeScale = 0f;
+        }
+
+        Debug.Log("Level 5 reached! Waiting for player upgrade choice.");
     }
 
     void UnlockShield()
@@ -166,6 +200,29 @@ public class PlayerLevel : MonoBehaviour
         }
     }
 
+    void UpgradeCombatMastery()
+    {
+        if (playerCombat != null)
+        {
+            if (!playerCombat.combatUnlocked)
+            {
+                playerCombat.Unlock();
+            }
+
+            playerCombat.attackDamage += 6f;
+            playerCombat.attackCooldown = Mathf.Max(0.2f, playerCombat.attackCooldown - 0.1f);
+        }
+    }
+
+    void UpgradeShieldMastery()
+    {
+        if (playerShield != null)
+        {
+            playerShield.UpgradeCharges(4);
+            playerShield.shieldDuration = Mathf.Max(playerShield.shieldDuration, 4f);
+        }
+    }
+
     public void ChooseCombatUnlock()
     {
         if (!isAwaitingLevel3Choice)
@@ -202,6 +259,24 @@ public class PlayerLevel : MonoBehaviour
         CompleteLevel4Choice();
     }
 
+    public void ChooseCombatMastery()
+    {
+        if (!isAwaitingLevel5Choice)
+            return;
+
+        UpgradeCombatMastery();
+        CompleteLevel5Choice();
+    }
+
+    public void ChooseShieldMastery()
+    {
+        if (!isAwaitingLevel5Choice)
+            return;
+
+        UpgradeShieldMastery();
+        CompleteLevel5Choice();
+    }
+
     void CompleteLevel3Choice()
     {
         isAwaitingLevel3Choice = false;
@@ -232,9 +307,24 @@ public class PlayerLevel : MonoBehaviour
         }
     }
 
+    void CompleteLevel5Choice()
+    {
+        isAwaitingLevel5Choice = false;
+
+        if (level5ChoiceWindow != null)
+        {
+            level5ChoiceWindow.SetActive(false);
+        }
+
+        if (ShouldPauseForLevel5())
+        {
+            Time.timeScale = 1f;
+        }
+    }
+
     void OnDisable()
     {
-        if ((ShouldPauseForLevel3() || ShouldPauseForLevel4()) && Time.timeScale == 0f)
+        if ((ShouldPauseForLevel3() || ShouldPauseForLevel4() || ShouldPauseForLevel5()) && Time.timeScale == 0f)
         {
             Time.timeScale = 1f;
         }
@@ -248,6 +338,11 @@ public class PlayerLevel : MonoBehaviour
     bool ShouldPauseForLevel4()
     {
         return pauseGameWhenChoosingLevel4;
+    }
+
+    bool ShouldPauseForLevel5()
+    {
+        return pauseGameWhenChoosingLevel5;
     }
 
     void GrowPlayer()

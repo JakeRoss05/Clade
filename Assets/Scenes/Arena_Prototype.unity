@@ -950,13 +950,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EvolutionChoiceTooltipTrigger
   tooltip: {fileID: 371707416}
-  optionTitle: Learn Combat
-  optionDescription: Neuromusclular pathways reorganize to enable targeted aggression.
-    The organism develops primitive offensive behaviours, allowing it to strike,
-    damage and defend against hostile entities.
-  optionStats: '+ Unlock basic attack ability
+  optionTitle: Predator Instinct
+  optionDescription: Neuromuscular reflexes sharpen into a lethal hunting pattern,
+    letting the organism land heavier hits more quickly.
+  optionStats: '+6 Attack Damage
 
-    + Enables damage to enemies'
+    -0.1 Attack Cooldown'
 --- !u!114 &151464927
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4312,7 +4311,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1500222913}
         m_TargetAssemblyTypeName: PlayerLevel, Assembly-CSharp
-        m_MethodName: ChooseCombatUnlock
+        m_MethodName: ChooseCombatMastery
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4807,7 +4806,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Gene B
+  m_text: Predator Instinct
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: aac85bd671578804a8760a7a94c0f3ca, type: 2}
   m_sharedMaterial: {fileID: -2315000162420587379, guid: aac85bd671578804a8760a7a94c0f3ca, type: 2}
@@ -5016,10 +5015,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EvolutionChoiceTooltipTrigger
   tooltip: {fileID: 371707416}
-  optionTitle: Upgrade Carapace
-  optionDescription: 'Adaptive defensive cycles accelerate, enabling the organism
-    to deploy protective barriers more often during prolonged encounters. '
-  optionStats: +3 Shield Charge
+  optionTitle: Fortified Carapace
+  optionDescription: 'Cell walls thicken and the protective lattice stabilizes, letting
+    the organism endure stronger blows and remain active through longer hunts. '
+  optionStats: '+2 Shield Charges
+
+    +1 Shield Duration'
 --- !u!114 &976522407
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5066,7 +5067,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: PlayerLevel, Assembly-CSharp
-        m_MethodName: ChooseShieldUpgrade
+        m_MethodName: ChooseShieldMastery
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -7508,6 +7509,8 @@ MonoBehaviour:
   pauseGameWhenChoosingLevel3: 1
   level4ChoiceWindow: {fileID: 1396894362}
   pauseGameWhenChoosingLevel4: 1
+  level5ChoiceWindow: {fileID: 680783723}
+  pauseGameWhenChoosingLevel5: 1
 --- !u!114 &1500222914
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8832,7 +8835,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Gene A
+  m_text: Fortified Carapace
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: aac85bd671578804a8760a7a94c0f3ca, type: 2}
   m_sharedMaterial: {fileID: -2315000162420587379, guid: aac85bd671578804a8760a7a94c0f3ca, type: 2}
