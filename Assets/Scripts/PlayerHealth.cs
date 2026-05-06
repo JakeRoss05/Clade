@@ -10,12 +10,14 @@ public class PlayerHealth : MonoBehaviour
 
     private PlayerMovement playerMovement;
     private PlayerShield playerShield;
+    private DeathScreenManager deathScreenManager;
 
     void Start()
     {
         currentHealth = maxHealth;
         playerMovement = GetComponent<PlayerMovement>();
         playerShield = GetComponent<PlayerShield>();
+        deathScreenManager = FindObjectOfType<DeathScreenManager>();
     }
 
     void Update()
@@ -62,6 +64,15 @@ public class PlayerHealth : MonoBehaviour
     void Die()
     { 
         Debug.Log("Player has died.");
-        Destroy(gameObject);
+        
+        if (deathScreenManager != null)
+        {
+            deathScreenManager.ShowDeathScreen();
+        }
+        else
+        {
+            Debug.LogWarning("DeathScreenManager not found in scene. Player destroyed instead.");
+            Destroy(gameObject);
+        }
     }
 }
