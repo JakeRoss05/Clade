@@ -12,7 +12,11 @@ public class TypewriterEffect : MonoBehaviour
 
     void Start()
     {
-        textComponent = GetComponent<TextMeshProUGUI>();
+        textComponent = GetComponentInChildren<TextMeshProUGUI>();
+        if (textComponent == null)
+        {
+            Debug.LogError("TextMeshProUGUI component not found in TypewriterEffect or its children!");
+        }
     }
 
     public void SetPhrases(params string[] newPhrases)
@@ -58,12 +62,17 @@ public class TypewriterEffect : MonoBehaviour
         textComponent.maxVisibleCharacters = 0;
         int charCount = 0;
 
+        Debug.Log($"Starting typewriter for phrase: '{phrase}' (length: {phrase.Length})");
+
         while (charCount < phrase.Length)
         {
             charCount++;
             textComponent.maxVisibleCharacters = charCount;
+            Debug.Log($"Typing character {charCount}/{phrase.Length}");
             yield return new WaitForSecondsRealtime(delayBetweenCharacters);
         }
+
+        Debug.Log("Finished typing phrase");
     }
 
     private IEnumerator BackspacePhrase()

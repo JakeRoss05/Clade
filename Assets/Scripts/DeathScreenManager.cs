@@ -28,7 +28,7 @@ public class DeathScreenManager : MonoBehaviour
         // Set up the phrases for the typewriter effect
         if (typewriterEffect != null)
         {
-            typewriterEffect.SetPhrases("YOU DIED", "GAME OVER");
+            typewriterEffect.SetPhrases("GENETIC LINE TERMINATED", "ORGANISM LOST");
             typewriterEffect.StartTypewriter();
         }
 
