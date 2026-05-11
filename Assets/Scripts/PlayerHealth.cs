@@ -17,7 +17,7 @@ public class PlayerHealth : MonoBehaviour
         currentHealth = maxHealth;
         playerMovement = GetComponent<PlayerMovement>();
         playerShield = GetComponent<PlayerShield>();
-        deathScreenManager = FindObjectOfType<DeathScreenManager>();
+        deathScreenManager = FindFirstObjectByType<DeathScreenManager>();
     }
 
     void Update()

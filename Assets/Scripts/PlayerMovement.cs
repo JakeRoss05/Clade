@@ -41,6 +41,12 @@ public class PlayerMovement : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         energy = GetComponent<Energy>();
+        if (rb != null)
+        {
+            rb.constraints |= RigidbodyConstraints.FreezePositionY;
+            rb.constraints |= RigidbodyConstraints.FreezeRotationX;
+            rb.constraints |= RigidbodyConstraints.FreezeRotationZ;
+        }
     }
 
     private void FixedUpdate()

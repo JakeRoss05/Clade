@@ -21,6 +21,7 @@ public class EnemyHealthBar : MonoBehaviour
 
     void Awake()
     {
+        Debug.Log($"[EnemyHealthBar] Awake on '{gameObject.name}' (active={gameObject.activeInHierarchy}). targetCanvas={targetCanvas}, healthBarPrefab={healthBarPrefab}");
         enemy = GetComponent<MicrobeEnemy>();
         mainCamera = Camera.main;
         EnsureCanvas();
@@ -39,6 +40,7 @@ public class EnemyHealthBar : MonoBehaviour
         if (spawnedBarRect == null)
             spawnedBarRect = spawnedBar.GetComponent<RectTransform>();
 
+
         Vector3 worldPosition = transform.position + worldOffset;
         Vector3 screenPosition = mainCamera.WorldToScreenPoint(worldPosition);
         bool visible = screenPosition.z > 0f && !forceHidden;
@@ -46,9 +48,14 @@ public class EnemyHealthBar : MonoBehaviour
         if (spawnedBar.gameObject.activeSelf != visible)
             spawnedBar.gameObject.SetActive(visible);
 
-        if (visible)
+        if (visible && spawnedBarRect != null && targetCanvas != null)
         {
-            spawnedBarRect.position = new Vector3(screenPosition.x, screenPosition.y, 0f);
+            Canvas canvas = targetCanvas;
+            RectTransform canvasRect = canvas.GetComponent<RectTransform>();
+            Vector2 anchoredPos;
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, new Vector2(screenPosition.x, screenPosition.y), canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : canvas.worldCamera, out anchoredPos);
+            spawnedBarRect.anchoredPosition = anchoredPos;
+            spawnedBarRect.SetAsLastSibling();
         }
 
         Refresh();
@@ -86,6 +93,13 @@ public class EnemyHealthBar : MonoBehaviour
             spawnedBar.minValue = 0f;
             spawnedBar.maxValue = Mathf.Max(1f, enemy != null ? enemy.maxHealth : 1f);
             spawnedBar.value = enemy != null ? enemy.health : 0f;
+            if (spawnedBarRect != null)
+            {
+                spawnedBarRect.SetParent(targetCanvas.transform, false);
+                spawnedBarRect.localScale = Vector3.one;
+            }
+            spawnedBar.gameObject.SetActive(true);
+            Debug.Log($"[EnemyHealthBar] Spawned bar for '{gameObject.name}' under canvas '{targetCanvas.name}'");
         }
 
         if (spawnedBar == null)
@@ -93,6 +107,7 @@ public class EnemyHealthBar : MonoBehaviour
             spawnedBar = CreateFallbackBar(targetCanvas.transform);
             spawnedBarRect = spawnedBar.GetComponent<RectTransform>();
             spawnedBar.name = "EnemyHealthBarUI";
+            Debug.Log($"[EnemyHealthBar] Created fallback bar for '{gameObject.name}'");
         }
     }
 

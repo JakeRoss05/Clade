@@ -14,9 +14,21 @@ public class EnemySpawner : MonoBehaviour
 
     void Start()
     {
+        // Remove any pre-placed Enemy instances in the scene so the spawner controls all spawns
+        GameObject[] preplaced = GameObject.FindGameObjectsWithTag("Enemy");
+        for (int i = 0; i < preplaced.Length; i++)
+        {
+            Debug.Log($"[EnemySpawner] Destroying pre-placed enemy: {preplaced[i].name}");
+            Destroy(preplaced[i]);
+        }
+
         InvokeRepeating("SpawnEnemy", spawnInterval, spawnInterval);
         playerLevel = FindFirstObjectByType<PlayerLevel>();
+        Debug.Log($"[EnemySpawner] Initialized. spawnerPos={transform.position}, spawnRadius={spawnRadius}, playerLevel={(playerLevel!=null?playerLevel.level:-1)}");
     }
+
+    // Debug option to force medium enemies for testing
+    public bool debugForceMedium = false;
 
     void SpawnEnemy()
     {
@@ -58,8 +70,14 @@ public class EnemySpawner : MonoBehaviour
         }
 
         Vector3 spawnPosition = transform.position + Random.insideUnitSphere * spawnRadius;
-        spawnPosition.y = 0;
+        spawnPosition.y = 0.5f;
 
-        Instantiate(enemyToSpawn, spawnPosition, Quaternion.identity); 
+        if (debugForceMedium && mediumEnemyPrefab != null)
+            enemyToSpawn = mediumEnemyPrefab;
+
+        Debug.Log($"[EnemySpawner] Spawning '{(enemyToSpawn!=null?enemyToSpawn.name:"null")}' at {spawnPosition}");
+
+        if (enemyToSpawn != null)
+            Instantiate(enemyToSpawn, spawnPosition, Quaternion.identity);
     }
 }

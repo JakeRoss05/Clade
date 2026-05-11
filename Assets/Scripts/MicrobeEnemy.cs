@@ -98,15 +98,31 @@ public class MicrobeEnemy : MonoBehaviour
     void MoveTowardsPlayer()
     {
         Vector3 direction = (player.position - transform.position).normalized;
+        direction.y = 0f;
+
+        if (direction.sqrMagnitude > 0.0001f)
+        {
+            direction.Normalize();
+        }
 
         transform.position += direction * speed * Time.deltaTime;
 
-        transform.LookAt(player);
+        Vector3 position = transform.position;
+        position.y = 0.5f;
+        transform.position = position;
+
+        FaceFlatDirection(direction);
     }
 
     void Wander()
     {
         transform.position += wanderDirection * wanderSpeed * Time.deltaTime;
+
+        Vector3 position = transform.position;
+        position.y = 0.5f;
+        transform.position = position;
+
+        FaceFlatDirection(wanderDirection);
 
         if (Random.Range(0f, 1f) < 0.01f)
         {
@@ -114,6 +130,16 @@ public class MicrobeEnemy : MonoBehaviour
             wanderDirection.y = 0;
             wanderDirection.Normalize();
         }
+    }
+
+    void FaceFlatDirection(Vector3 direction)
+    {
+        direction.y = 0f;
+
+        if (direction.sqrMagnitude < 0.0001f)
+            return;
+
+        transform.rotation = Quaternion.LookRotation(direction.normalized, Vector3.up);
     }
 
     public void TakeDamage(float damage)
@@ -243,7 +269,7 @@ public class MicrobeEnemy : MonoBehaviour
             healthBar.SetVisible(false);
     }
 
-    private void OnCollisionStay(Collision other)
+    private void OnTriggerStay(Collider other)
     {
         if (other.gameObject.CompareTag("Player") && Time.time - lastAttackTime >= attackCooldown)
         {
