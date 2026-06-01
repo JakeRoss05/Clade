@@ -264,7 +264,14 @@ public class PlayerLevel : MonoBehaviour
         if (!isAwaitingLevel5Choice)
             return;
 
-        UpgradeCombatMastery();
+        // At level 5 this choice unlocks a dash ability (space) with visual effects
+        PlayerMovement pm = GetComponent<PlayerMovement>();
+        if (pm != null)
+        {
+            pm.EnableDash();
+            Debug.Log("Dash ability unlocked at level 5.");
+        }
+
         CompleteLevel5Choice();
     }
 

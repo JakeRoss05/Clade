@@ -23,6 +23,8 @@ public class MicrobeEnemy : MonoBehaviour
     private Vector3 wanderDirection;
 
     private Transform player;
+    private Rigidbody enemyRigidbody;
+    private Collider enemyCollider;
     private Renderer[] cachedRenderers;
     private Material[][] cachedMaterials;
     private Color[][] cachedMaterialColors;
@@ -73,6 +75,15 @@ public class MicrobeEnemy : MonoBehaviour
                 speed = 4f;
                 break;
         }
+    }
+
+    public void SetTier(EnemyTier newTier)
+    {
+        tier = newTier;
+        ApplyTierStats();
+
+        if (healthBar != null)
+            healthBar.Refresh();
     }
 
     void Update()
@@ -205,6 +216,17 @@ public class MicrobeEnemy : MonoBehaviour
 
     void EnsureSupportComponents()
     {
+        enemyRigidbody = GetComponent<Rigidbody>();
+        if (enemyRigidbody != null)
+        {
+            enemyRigidbody.useGravity = false;
+            enemyRigidbody.isKinematic = true;
+        }
+
+        enemyCollider = GetComponent<Collider>();
+        if (enemyCollider != null)
+            enemyCollider.isTrigger = true;
+
         if (healthBar == null)
             healthBar = GetComponent<EnemyHealthBar>();
 
@@ -239,6 +261,7 @@ public class MicrobeEnemy : MonoBehaviour
                     continue;
 
                 Color targetColor = shouldTint ? tint : cachedMaterialColors[i][j];
+                targetColor.a = cachedMaterialColors[i][j].a;
 
                 if (material.HasProperty("_BaseColor"))
                     material.SetColor("_BaseColor", targetColor);
@@ -271,14 +294,27 @@ public class MicrobeEnemy : MonoBehaviour
 
     private void OnTriggerStay(Collider other)
     {
-        if (other.gameObject.CompareTag("Player") && Time.time - lastAttackTime >= attackCooldown)
-        {
-            PlayerHealth playerHealth = other.gameObject.GetComponent<PlayerHealth>();
-            if (playerHealth != null)
-            {
-                playerHealth.TakeDamage(damage);
-                lastAttackTime = Time.time;
-            }
-        }
+        TryAttackPlayer(other);
+    }
+
+    private void OnCollisionStay(Collision collision)
+    {
+        TryAttackPlayer(collision.collider);
+    }
+
+    private void TryAttackPlayer(Collider other)
+    {
+        if (other == null || !other.CompareTag("Player") || Time.time - lastAttackTime < attackCooldown)
+            return;
+
+        PlayerHealth playerHealth = other.GetComponentInParent<PlayerHealth>();
+        if (playerHealth == null)
+            playerHealth = other.GetComponent<PlayerHealth>();
+
+        if (playerHealth == null)
+            return;
+
+        playerHealth.TakeDamage(damage);
+        lastAttackTime = Time.time;
     }
 }

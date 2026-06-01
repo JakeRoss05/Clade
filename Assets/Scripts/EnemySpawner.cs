@@ -38,46 +38,90 @@ public class EnemySpawner : MonoBehaviour
         int level = playerLevel != null ? playerLevel.level : 1;
 
         GameObject enemyToSpawn;
+        MicrobeEnemy.EnemyTier spawnedTier = MicrobeEnemy.EnemyTier.Weak;
         float roll = Random.value;
 
         if (level <= 1)
         {
             // Level 1: only weak enemies
             enemyToSpawn = weakEnemyPrefab;
+            spawnedTier = MicrobeEnemy.EnemyTier.Weak;
         }
         else if (level == 2)
         {
             // Level 2: mostly weak, some medium
-            enemyToSpawn = roll < 0.7f ? weakEnemyPrefab : mediumEnemyPrefab;
+            if (roll < 0.7f)
+            {
+                enemyToSpawn = weakEnemyPrefab;
+                spawnedTier = MicrobeEnemy.EnemyTier.Weak;
+            }
+            else
+            {
+                enemyToSpawn = mediumEnemyPrefab;
+                spawnedTier = MicrobeEnemy.EnemyTier.Medium;
+            }
         }
         else if (level == 3)
         {
             // Level 3: mix of weak and medium
-            enemyToSpawn = roll < 0.4f ? weakEnemyPrefab : mediumEnemyPrefab;
+            if (roll < 0.4f)
+            {
+                enemyToSpawn = weakEnemyPrefab;
+                spawnedTier = MicrobeEnemy.EnemyTier.Weak;
+            }
+            else
+            {
+                enemyToSpawn = mediumEnemyPrefab;
+                spawnedTier = MicrobeEnemy.EnemyTier.Medium;
+            }
         }
         else if (level == 4)
         {
             // Level 4: medium and max
-            enemyToSpawn = roll < 0.5f ? mediumEnemyPrefab : maxEnemyPrefab;
+            if (roll < 0.5f)
+            {
+                enemyToSpawn = mediumEnemyPrefab;
+                spawnedTier = MicrobeEnemy.EnemyTier.Medium;
+            }
+            else
+            {
+                enemyToSpawn = maxEnemyPrefab;
+                spawnedTier = MicrobeEnemy.EnemyTier.Max;
+            }
         }
         else
         {
             // Level 5: mostly max enemies
             if (roll < 0.2f)
+            {
                 enemyToSpawn = mediumEnemyPrefab;
+                spawnedTier = MicrobeEnemy.EnemyTier.Medium;
+            }
             else
+            {
                 enemyToSpawn = maxEnemyPrefab;
+                spawnedTier = MicrobeEnemy.EnemyTier.Max;
+            }
         }
 
         Vector3 spawnPosition = transform.position + Random.insideUnitSphere * spawnRadius;
         spawnPosition.y = 0.5f;
 
         if (debugForceMedium && mediumEnemyPrefab != null)
+        {
             enemyToSpawn = mediumEnemyPrefab;
+            spawnedTier = MicrobeEnemy.EnemyTier.Medium;
+        }
 
         Debug.Log($"[EnemySpawner] Spawning '{(enemyToSpawn!=null?enemyToSpawn.name:"null")}' at {spawnPosition}");
 
         if (enemyToSpawn != null)
-            Instantiate(enemyToSpawn, spawnPosition, Quaternion.identity);
+        {
+            GameObject spawnedEnemy = Instantiate(enemyToSpawn, spawnPosition, Quaternion.identity);
+            MicrobeEnemy microbeEnemy = spawnedEnemy.GetComponent<MicrobeEnemy>();
+
+            if (microbeEnemy != null)
+                microbeEnemy.SetTier(spawnedTier);
+        }
     }
 }

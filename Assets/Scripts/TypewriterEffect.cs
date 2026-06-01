@@ -10,13 +10,24 @@ public class TypewriterEffect : MonoBehaviour
     public float delayBetweenPhrases = 1f;
     private Coroutine typewriterCoroutine;
 
+    void Awake()
+    {
+        CacheTextComponent();
+    }
+
     void Start()
     {
-        textComponent = GetComponentInChildren<TextMeshProUGUI>();
+        CacheTextComponent();
+    }
+
+    void CacheTextComponent()
+    {
+        if (textComponent != null)
+            return;
+
+        textComponent = GetComponentInChildren<TextMeshProUGUI>(true);
         if (textComponent == null)
-        {
             Debug.LogError("TextMeshProUGUI component not found in TypewriterEffect or its children!");
-        }
     }
 
     public void SetPhrases(params string[] newPhrases)
@@ -26,6 +37,8 @@ public class TypewriterEffect : MonoBehaviour
 
     public void StartTypewriter()
     {
+        CacheTextComponent();
+
         // Stop any existing typewriter effect
         if (typewriterCoroutine != null)
             StopCoroutine(typewriterCoroutine);
@@ -58,17 +71,22 @@ public class TypewriterEffect : MonoBehaviour
 
     private IEnumerator TypePhrase(string phrase)
     {
+        if (textComponent == null)
+            yield break;
+
         textComponent.text = phrase;
+        textComponent.ForceMeshUpdate();
         textComponent.maxVisibleCharacters = 0;
         int charCount = 0;
+        int totalCharacters = textComponent.textInfo.characterCount;
 
-        Debug.Log($"Starting typewriter for phrase: '{phrase}' (length: {phrase.Length})");
+        Debug.Log($"Starting typewriter for phrase: '{phrase}' (length: {totalCharacters})");
 
-        while (charCount < phrase.Length)
+        while (charCount < totalCharacters)
         {
             charCount++;
             textComponent.maxVisibleCharacters = charCount;
-            Debug.Log($"Typing character {charCount}/{phrase.Length}");
+            Debug.Log($"Typing character {charCount}/{totalCharacters}");
             yield return new WaitForSecondsRealtime(delayBetweenCharacters);
         }
 

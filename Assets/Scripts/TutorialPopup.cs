@@ -9,6 +9,9 @@ public class TutorialPopup : MonoBehaviour
 
     [TextArea(3, 10)]
     public string[] messages;
+    
+    [SerializeField] private AudioClip windowPopup;
+    [SerializeField] private AudioClip exitBackSound;
 
     private int index = 0;
 
@@ -32,6 +35,13 @@ public class TutorialPopup : MonoBehaviour
         }
 
         SetPaused(true);
+
+        popup.SetActive(true);
+
+        if (SoundEffectManager.instance != null && windowPopup != null)
+        {
+            SoundEffectManager.instance.WindowPopup(windowPopup);
+        }
     }
 
     public void Next()
@@ -57,6 +67,10 @@ public class TutorialPopup : MonoBehaviour
 
     public void Close()
     {
+        if (SoundEffectManager.instance != null && exitBackSound != null)
+        {
+            SoundEffectManager.instance.ExitBackSound(exitBackSound);
+        }
         popup.SetActive(false);
         SetPaused(false);
     }

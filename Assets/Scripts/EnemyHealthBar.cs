@@ -66,8 +66,8 @@ public class EnemyHealthBar : MonoBehaviour
         if (spawnedBar == null || enemy == null)
             return;
 
-        spawnedBar.value = enemy.health;
         spawnedBar.maxValue = Mathf.Max(1f, enemy.maxHealth);
+        spawnedBar.value = Mathf.Clamp(enemy.health, spawnedBar.minValue, spawnedBar.maxValue);
     }
 
     public void SetVisible(bool visible)
@@ -92,7 +92,7 @@ public class EnemyHealthBar : MonoBehaviour
             spawnedBar.name = "EnemyHealthBarUI";
             spawnedBar.minValue = 0f;
             spawnedBar.maxValue = Mathf.Max(1f, enemy != null ? enemy.maxHealth : 1f);
-            spawnedBar.value = enemy != null ? enemy.health : 0f;
+            spawnedBar.value = enemy != null ? Mathf.Clamp(enemy.health, spawnedBar.minValue, spawnedBar.maxValue) : 0f;
             if (spawnedBarRect != null)
             {
                 spawnedBarRect.SetParent(targetCanvas.transform, false);
@@ -162,7 +162,15 @@ public class EnemyHealthBar : MonoBehaviour
         if (targetCanvas != null)
             return;
 
-        Canvas[] canvases = FindObjectsByType<Canvas>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+        UIManager uiManager = FindFirstObjectByType<UIManager>();
+        if (uiManager != null)
+        {
+            targetCanvas = uiManager.GetComponent<Canvas>();
+            if (targetCanvas != null)
+                return;
+        }
+
+        Canvas[] canvases = FindObjectsByType<Canvas>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         for (int i = 0; i < canvases.Length; i++)
         {
             if (canvases[i].renderMode == RenderMode.ScreenSpaceOverlay || canvases[i].renderMode == RenderMode.ScreenSpaceCamera)

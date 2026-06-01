@@ -11,6 +11,7 @@ public class PlayerHealth : MonoBehaviour
     private PlayerMovement playerMovement;
     private PlayerShield playerShield;
     private DeathScreenManager deathScreenManager;
+    private bool isDead;
 
     void Start()
     {
@@ -22,6 +23,9 @@ public class PlayerHealth : MonoBehaviour
 
     void Update()
     {
+        if (isDead)
+            return;
+
         DrainHealth();
     }
 
@@ -45,6 +49,9 @@ public class PlayerHealth : MonoBehaviour
 
     public void TakeDamage(float damage)
     {
+        if (isDead)
+            return;
+
         // Shield reduces damage by 75%
         if (playerShield != null && playerShield.shieldActive)
         {
@@ -63,6 +70,10 @@ public class PlayerHealth : MonoBehaviour
     
     void Die()
     { 
+        if (isDead)
+            return;
+
+        isDead = true;
         Debug.Log("Player has died.");
         
         if (deathScreenManager != null)
@@ -74,5 +85,7 @@ public class PlayerHealth : MonoBehaviour
             Debug.LogWarning("DeathScreenManager not found in scene. Player destroyed instead.");
             Destroy(gameObject);
         }
+
+        enabled = false;
     }
 }
