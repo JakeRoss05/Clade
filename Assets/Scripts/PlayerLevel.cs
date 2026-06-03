@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerLevel : MonoBehaviour
 {
@@ -111,6 +112,8 @@ public class PlayerLevel : MonoBehaviour
     {
         isAwaitingLevel3Choice = true;
 
+        PrepareChoiceWindow(level3ChoiceWindow);
+
         if (level3ChoiceWindow != null)
         {
             level3ChoiceWindow.SetActive(true);
@@ -128,6 +131,8 @@ public class PlayerLevel : MonoBehaviour
     {
         isAwaitingLevel4Choice = true;
 
+        PrepareChoiceWindow(level4ChoiceWindow);
+
         if (level4ChoiceWindow != null)
         {
             level4ChoiceWindow.SetActive(true);
@@ -144,6 +149,8 @@ public class PlayerLevel : MonoBehaviour
     void ShowLevel5ChoiceWindow()
     {
         isAwaitingLevel5Choice = true;
+
+        PrepareChoiceWindow(level5ChoiceWindow);
 
         if (level5ChoiceWindow != null)
         {
@@ -350,6 +357,37 @@ public class PlayerLevel : MonoBehaviour
     bool ShouldPauseForLevel5()
     {
         return pauseGameWhenChoosingLevel5;
+    }
+
+    void PrepareChoiceWindow(GameObject choiceWindow)
+    {
+        if (choiceWindow == null)
+            return;
+
+        Button[] buttons = choiceWindow.GetComponentsInChildren<Button>(true);
+        Graphic[] graphics = choiceWindow.GetComponentsInChildren<Graphic>(true);
+
+        foreach (Graphic graphic in graphics)
+        {
+            if (graphic == null)
+                continue;
+
+            bool isButtonTarget = false;
+
+            foreach (Button button in buttons)
+            {
+                if (button != null && button.targetGraphic == graphic)
+                {
+                    isButtonTarget = true;
+                    break;
+                }
+            }
+
+            if (!isButtonTarget)
+            {
+                graphic.raycastTarget = false;
+            }
+        }
     }
 
     void GrowPlayer()

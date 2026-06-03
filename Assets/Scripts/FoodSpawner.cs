@@ -6,13 +6,32 @@ public class FoodSpawner : MonoBehaviour
     public GameObject foodPrefab;
 
     [Header("Spawning")]
-    public int maxFood = 50;
-    public float spawnInterval = 1.5f;  
+    public int maxFood = 100;
+    public int spawnPerTick = 3;
+    public float spawnInterval = 0.75f;  
 
     [Header("Spawn Area")]
-    public float spawnRadius = 10f;
+    public float spawnRadius = 14f;
 
     private float timer;
+
+    void Awake()
+    {
+        if (transform.parent != null)
+        {
+            transform.SetParent(null, true);
+        }
+
+        maxFood = Mathf.Max(maxFood, 100);
+        spawnPerTick = Mathf.Max(spawnPerTick, 3);
+        spawnInterval = Mathf.Min(spawnInterval, 0.75f);
+        spawnRadius = Mathf.Max(spawnRadius, 14f);
+    }
+
+    void Start()
+    {
+        SpawnFoodUntilMax();
+    }
 
     void Update()
     {
@@ -21,13 +40,20 @@ public class FoodSpawner : MonoBehaviour
         if (timer >= spawnInterval)
         {
             timer = 0f;
-
-            if (GameObject.FindGameObjectsWithTag("Food").Length < maxFood)
-            {
-                SpawnFood();
-            }
+            SpawnFoodUntilMax();
         }
     }   
+
+    void SpawnFoodUntilMax()
+    {
+        int currentFoodCount = GameObject.FindGameObjectsWithTag("Food").Length;
+        int foodToSpawn = Mathf.Min(spawnPerTick, Mathf.Max(0, maxFood - currentFoodCount));
+
+        for (int i = 0; i < foodToSpawn; i++)
+        {
+            SpawnFood();
+        }
+    }
 
     void SpawnFood()
     {
@@ -38,6 +64,18 @@ public class FoodSpawner : MonoBehaviour
                 Random.Range(-spawnRadius, spawnRadius)
             );
 
-        Instantiate(foodPrefab, randomPos, Quaternion.identity);
+        if (foodPrefab == null)
+        {
+            Debug.LogError("FoodSpawner has no foodPrefab assigned.");
+            return;
+        }
+
+        GameObject spawnedFood = Instantiate(foodPrefab, randomPos, Quaternion.identity);
+        spawnedFood.tag = "Food";
+
+        if (spawnedFood.GetComponent<Food>() == null)
+        {
+            spawnedFood.AddComponent<Food>();
+        }
     }
 }

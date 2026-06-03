@@ -18,7 +18,7 @@ public static class UnderwaterEffectsManager
     static void Init()
     {
         if (initialized) return;
-        var vols = GameObject.FindObjectsOfType<Volume>();
+        var vols = Object.FindObjectsByType<Volume>(FindObjectsSortMode.None);
         foreach (var v in vols)
         {
             if (v.isGlobal && v.sharedProfile != null)

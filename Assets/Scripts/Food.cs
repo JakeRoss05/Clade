@@ -9,6 +9,60 @@ public class Food : MonoBehaviour
 
     private bool consumed;
 
+    private void Awake()
+    {
+        EnsureConsumePhysics();
+    }
+
+    private void EnsureConsumePhysics()
+    {
+        Rigidbody rigidbody = GetComponent<Rigidbody>();
+        if (rigidbody == null)
+        {
+            rigidbody = gameObject.AddComponent<Rigidbody>();
+        }
+
+        rigidbody.useGravity = false;
+        rigidbody.isKinematic = true;
+
+        Collider[] colliders = GetComponentsInChildren<Collider>();
+        if (colliders.Length == 0)
+        {
+            SphereCollider sphereCollider = gameObject.AddComponent<SphereCollider>();
+            sphereCollider.isTrigger = true;
+            sphereCollider.center = Vector3.zero;
+
+            Renderer[] renderers = GetComponentsInChildren<Renderer>();
+            if (renderers.Length > 0)
+            {
+                Bounds bounds = renderers[0].bounds;
+                for (int i = 1; i < renderers.Length; i++)
+                {
+                    bounds.Encapsulate(renderers[i].bounds);
+                }
+
+                sphereCollider.center = transform.InverseTransformPoint(bounds.center);
+
+                float maxScale = Mathf.Max(transform.lossyScale.x, transform.lossyScale.y, transform.lossyScale.z);
+                if (maxScale > 0f)
+                {
+                    sphereCollider.radius = Mathf.Max(bounds.extents.x, bounds.extents.y, bounds.extents.z) / maxScale;
+                }
+            }
+            else
+            {
+                sphereCollider.radius = 0.5f;
+            }
+
+            return;
+        }
+
+        foreach (Collider collider in colliders)
+        {
+            collider.isTrigger = true;
+        }
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         TryConsume(other);
