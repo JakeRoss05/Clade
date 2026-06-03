@@ -4,7 +4,7 @@ public class Food : MonoBehaviour
 {
     [Header("Food Effects")]
     public float energyValue = 25f;
-    public float sizeIncrease = 0.1f;
+    public float sizeIncrease = 0.005f;
     public int xpvalue = 1;
 
     private bool consumed;
@@ -107,7 +107,12 @@ public class Food : MonoBehaviour
 
         if (player != null)
         {
-            player.sizeMultiplier += sizeIncrease;
+            player.AddSizeMultiplier(sizeIncrease);
+        }
+
+        if (SoundEffectManager.instance != null)
+        {
+            SoundEffectManager.instance.FoodEatenSound();
         }
 
         Destroy(gameObject);

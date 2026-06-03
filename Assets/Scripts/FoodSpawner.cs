@@ -6,12 +6,12 @@ public class FoodSpawner : MonoBehaviour
     public GameObject foodPrefab;
 
     [Header("Spawning")]
-    public int maxFood = 100;
-    public int spawnPerTick = 3;
-    public float spawnInterval = 0.75f;  
+    public int maxFood = 44;
+    public int spawnPerTick = 2;
+    public float spawnInterval = 1.6f;  
 
     [Header("Spawn Area")]
-    public float spawnRadius = 14f;
+    public float spawnRadius = 12f;
 
     private float timer;
 
@@ -22,10 +22,10 @@ public class FoodSpawner : MonoBehaviour
             transform.SetParent(null, true);
         }
 
-        maxFood = Mathf.Max(maxFood, 100);
-        spawnPerTick = Mathf.Max(spawnPerTick, 3);
-        spawnInterval = Mathf.Min(spawnInterval, 0.75f);
-        spawnRadius = Mathf.Max(spawnRadius, 14f);
+        maxFood = Mathf.Clamp(maxFood, 24, 60);
+        spawnPerTick = Mathf.Clamp(spawnPerTick, 1, 3);
+        spawnInterval = Mathf.Clamp(spawnInterval, 1.2f, 3f);
+        spawnRadius = Mathf.Clamp(spawnRadius, 10f, 18f);
     }
 
     void Start()

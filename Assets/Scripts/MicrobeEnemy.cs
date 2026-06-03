@@ -57,19 +57,19 @@ public class MicrobeEnemy : MonoBehaviour
         switch (tier)
         {
             case EnemyTier.Weak:
-                damage = 5f;
+                damage = 6f;
                 health = 20f;
                 maxHealth = 20f;
                 speed = 2f;
                 break;
             case EnemyTier.Medium:
-                damage = 10f;
+                damage = 12f;
                 health = 40f;
                 maxHealth = 40f;
                 speed = 3f;
                 break;
             case EnemyTier.Max:
-                damage = 20f;
+                damage = 24f;
                 health = 80f;
                 maxHealth = 80f;
                 speed = 4f;

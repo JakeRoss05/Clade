@@ -1341,9 +1341,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1500222913}
         m_TargetAssemblyTypeName: PlayerLevel, Assembly-CSharp
-        m_MethodName: ChooseCombatUnlock
+        m_MethodName: ChooseShieldMastery
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3324,7 +3324,7 @@ MonoBehaviour:
   titleText: {fileID: 642668746}
   descriptionText: {fileID: 614190375}
   statsText: {fileID: 1693238586}
-  screenOffset: {x: 2, y: -2}
+  screenOffset: {x: 0, y: 0}
   statsColor: {r: 0, g: 1, b: 0, a: 1}
   negativeStatsColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!114 &371707417
@@ -4565,6 +4565,7 @@ GameObject:
   - component: {fileID: 474191864}
   - component: {fileID: 474191863}
   - component: {fileID: 474191862}
+  - component: {fileID: 474191865}
   m_Layer: 0
   m_Name: SoundEffectManager
   m_TagString: Untagged
@@ -4682,6 +4683,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SoundEffectManager
   audioSource: {fileID: 0}
+  ambientAudioSource: {fileID: 474191865}
+  foodEatenClip: {fileID: 8300000, guid: b0c912565dede5d4ca7392a21287791d, type: 3}
+  ambientClip: {fileID: 8300000, guid: 3250afe296209d041a458793ce95ac63, type: 3}
+  ambientVolume: 0.35
 --- !u!4 &474191864
 Transform:
   m_ObjectHideFlags: 0
@@ -4697,6 +4702,103 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!82 &474191865
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 474191861}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 8300000, guid: 4c1974c8fc00e034cbf9d6fe25faf2b7, type: 3}
+  m_PlayOnAwake: 0
+  m_Volume: 0.35
+  m_Pitch: 1
+  Loop: 1
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &485474175
 GameObject:
   m_ObjectHideFlags: 0
@@ -6828,7 +6930,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1500222913}
         m_TargetAssemblyTypeName: PlayerLevel, Assembly-CSharp
-        m_MethodName: ChooseCombatMastery
+        m_MethodName: ChooseCombatUnlock
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -7117,10 +7219,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FoodSpawner
   foodPrefab: {fileID: 5590393217285739126, guid: bb3e0e5f2f1042b4db80f81258b82696, type: 3}
-  maxFood: 56
-  spawnPerTick: 3
-  spawnInterval: 1.35
-  spawnRadius: 10
+  maxFood: 44
+  spawnPerTick: 2
+  spawnInterval: 1.6
+  spawnRadius: 12
 --- !u!4 &809794910
 Transform:
   m_ObjectHideFlags: 0
@@ -7951,7 +8053,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1500222913}
         m_TargetAssemblyTypeName: PlayerLevel, Assembly-CSharp
         m_MethodName: ChooseCombatMastery
         m_Mode: 1
@@ -8952,7 +9054,7 @@ MonoBehaviour:
   titleText: {fileID: 1146543827}
   descriptionText: {fileID: 1546017194}
   statsText: {fileID: 177709078}
-  screenOffset: {x: 2, y: -2}
+  screenOffset: {x: 0, y: 0}
   statsColor: {r: 0, g: 1, b: 0, a: 1}
   negativeStatsColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!114 &1042756930
@@ -11264,7 +11366,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerLevel
   level: 1
   foodCollected: 0
-  foodToLevelUp: 5
+  foodToLevelUp: 15
   playerEnergy: {fileID: 1500222915}
   playerHealth: {fileID: 1500222914}
   playerShield: {fileID: 1500222912}
@@ -11309,6 +11411,9 @@ MonoBehaviour:
   boostEnergyCostMultiplier: 1
   absorbFoodUnlocked: 0
   absorbRange: 3
+  absorbTickInterval: 0.12
+  maxFoodPerTick: 1
+  maxAbsorbRange: 4.5
 --- !u!114 &1500222916
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11323,6 +11428,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   baseSpeed: 5
   sizeMultiplier: 1
+  minSizeMultiplier: 1
+  maxSizeMultiplier: 1.5
   boostMultiplier: 2
   boostEnergyCostPerSecond: 10
   dashUnlocked: 0
@@ -12569,7 +12676,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 00548cdf2e69cf544a823655168515fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameplayMusicController
-  musicClip: {fileID: 8300000, guid: 6c63ad672e07f344ba92affecc4aeae8, type: 3}
+  musicClip: {fileID: 8300000, guid: 341811662391f6043b11bdacb969bce2, type: 3}
   targetVolume: 0.6
   loop: 1
   startDelay: 0
@@ -13644,7 +13751,7 @@ MonoBehaviour:
   titleText: {fileID: 891344480}
   descriptionText: {fileID: 2021341178}
   statsText: {fileID: 416300450}
-  screenOffset: {x: 2, y: -2}
+  screenOffset: {x: 0, y: 0}
   statsColor: {r: 0, g: 1, b: 0, a: 1}
   negativeStatsColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!114 &1851682071
@@ -15825,6 +15932,7 @@ MonoBehaviour:
   shieldPromptFadeDuration: 0.6
   shieldPromptFloatAmplitude: 10
   shieldPromptFloatFrequency: 1.5
+  promptAppearSound: {fileID: 8300000, guid: d9994726213cbd44db113d11e50d63a5, type: 3}
   shieldUnlockNotification: {fileID: 727742589}
   combatUnlockNotification: {fileID: 115136934}
   notificationVisibleDuration: 6

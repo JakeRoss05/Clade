@@ -10,6 +10,9 @@ using UnityEditor;
 
 public class PauseMenuController : MonoBehaviour
 {
+    const string MainMenuSceneName = "MainMenu";
+    const int VignetteTextureSize = 128;
+
     GameObject pauseRoot;
     bool paused = false;
 
@@ -90,12 +93,24 @@ public class PauseMenuController : MonoBehaviour
         var overlay = new GameObject("Overlay");
         overlay.transform.SetParent(canvasGO.transform, false);
         var img = overlay.AddComponent<Image>();
-        img.color = new Color(0f, 0f, 0f, 0.6f);
+        img.color = new Color(0f, 0f, 0f, 0.4f);
         var rt = overlay.GetComponent<RectTransform>();
         rt.anchorMin = Vector2.zero;
         rt.anchorMax = Vector2.one;
         rt.offsetMin = Vector2.zero;
         rt.offsetMax = Vector2.zero;
+
+        var vignette = new GameObject("VignetteOverlay");
+        vignette.transform.SetParent(canvasGO.transform, false);
+        var vignetteImage = vignette.AddComponent<Image>();
+        vignetteImage.color = Color.white;
+        vignetteImage.raycastTarget = false;
+        vignetteImage.sprite = CreateVignetteSprite();
+        var vignetteRect = vignette.GetComponent<RectTransform>();
+        vignetteRect.anchorMin = Vector2.zero;
+        vignetteRect.anchorMax = Vector2.one;
+        vignetteRect.offsetMin = Vector2.zero;
+        vignetteRect.offsetMax = Vector2.zero;
 
         // Center panel
         var panel = new GameObject("PausePanel");
@@ -141,7 +156,7 @@ public class PauseMenuController : MonoBehaviour
         CreateButton(btnContainer.transform, "Resume", () => { Resume(); });
 
         // Quit to Menu button
-        CreateButton(btnContainer.transform, "Quit to Menu", () => { Time.timeScale = 1f; SceneManager.LoadScene("Main_Menu"); });
+        CreateButton(btnContainer.transform, "Quit to Menu", () => { Time.timeScale = 1f; SceneManager.LoadScene(MainMenuSceneName); });
 
         // Quit to Desktop button
         CreateButton(btnContainer.transform, "Quit to Desktop", () => {
@@ -182,5 +197,30 @@ public class PauseMenuController : MonoBehaviour
         trt.offsetMin = trt.offsetMax = Vector2.zero;
 
         if (onClick != null) btn.onClick.AddListener(() => onClick());
+    }
+
+    Sprite CreateVignetteSprite()
+    {
+        Texture2D texture = new Texture2D(VignetteTextureSize, VignetteTextureSize, TextureFormat.RGBA32, false);
+        texture.wrapMode = TextureWrapMode.Clamp;
+        texture.filterMode = FilterMode.Bilinear;
+
+        float centerX = (VignetteTextureSize - 1) * 0.5f;
+        float centerY = (VignetteTextureSize - 1) * 0.5f;
+        float maxDistance = Vector2.Distance(Vector2.zero, new Vector2(centerX, centerY));
+
+        for (int y = 0; y < VignetteTextureSize; y++)
+        {
+            for (int x = 0; x < VignetteTextureSize; x++)
+            {
+                float distance = Vector2.Distance(new Vector2(x, y), new Vector2(centerX, centerY));
+                float t = Mathf.Clamp01(distance / maxDistance);
+                float alpha = Mathf.SmoothStep(0f, 1f, Mathf.Pow(t, 1.45f)) * 0.8f;
+                texture.SetPixel(x, y, new Color(0f, 0f, 0f, alpha));
+            }
+        }
+
+        texture.Apply();
+        return Sprite.Create(texture, new Rect(0f, 0f, VignetteTextureSize, VignetteTextureSize), new Vector2(0.5f, 0.5f), 1f);
     }
 }

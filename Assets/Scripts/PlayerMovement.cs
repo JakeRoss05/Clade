@@ -6,6 +6,8 @@ public class PlayerMovement : MonoBehaviour
     [Header("Evolution Stats")]
     public float baseSpeed = 5f;
     public float sizeMultiplier = 1f;
+    public float minSizeMultiplier = 1f;
+    public float maxSizeMultiplier = 1.5f;
 
     [Header("Boost")]
     public float boostMultiplier = 2f;
@@ -53,6 +55,7 @@ public class PlayerMovement : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         energy = GetComponent<Energy>();
         cameraFollow = Camera.main != null ? Camera.main.GetComponent<CameraFollow>() : null;
+        sizeMultiplier = Mathf.Clamp(sizeMultiplier, minSizeMultiplier, maxSizeMultiplier);
         if (rb != null)
         {
             rb.constraints |= RigidbodyConstraints.FreezePositionY;
@@ -108,6 +111,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
+        sizeMultiplier = Mathf.Clamp(sizeMultiplier, minSizeMultiplier, maxSizeMultiplier);
         isBoosting = Keyboard.current.leftShiftKey.isPressed;
         Vector3 movement = new Vector3(moveInput.x, 0f, moveInput.y);
 
@@ -182,5 +186,10 @@ public class PlayerMovement : MonoBehaviour
         dashUnlocked = true;
         if (dashTrail != null)
             dashTrail.emitting = false; // keep off until dashing
+    }
+
+    public void AddSizeMultiplier(float amount)
+    {
+        sizeMultiplier = Mathf.Clamp(sizeMultiplier + amount, minSizeMultiplier, maxSizeMultiplier);
     }
 }

@@ -6,7 +6,7 @@ public class PlayerLevel : MonoBehaviour
     public int level = 1;
 
     public int foodCollected = 0;
-    public int foodToLevelUp = 5;
+    public int foodToLevelUp = 15;
 
     public Energy playerEnergy;
     public PlayerHealth playerHealth;
@@ -73,7 +73,7 @@ public class PlayerLevel : MonoBehaviour
         level++;
 
         foodCollected = 0;
-        foodToLevelUp += 3;
+        foodToLevelUp += 8;
 
         Debug.Log("Player leveled up! Current level: " + level);
 

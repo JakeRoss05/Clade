@@ -55,6 +55,7 @@ public class UIManager : MonoBehaviour
     public float shieldPromptFadeDuration = 0.6f;
     public float shieldPromptFloatAmplitude = 10f;
     public float shieldPromptFloatFrequency = 1.5f;
+    public AudioClip promptAppearSound;
 
     [Header("Unlock Notification")]
     public GameObject shieldUnlockNotification;
@@ -78,6 +79,7 @@ public class UIManager : MonoBehaviour
     private CanvasGroup shieldUnlockNotificationGroup;
     private CanvasGroup combatUnlockNotificationGroup;
     private Camera mainCam;
+    private Canvas uiCanvas;
 
     void Awake()
     {
@@ -93,6 +95,13 @@ public class UIManager : MonoBehaviour
     void Start()
     {
         mainCam = Camera.main;
+        uiCanvas = GetComponent<Canvas>();
+
+        if (uiCanvas != null)
+        {
+            uiCanvas.overrideSorting = true;
+            uiCanvas.sortingOrder = 3000;
+        }
 
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
@@ -429,6 +438,11 @@ public class UIManager : MonoBehaviour
         hasShownShieldPrompt = true;
 
         shieldPrompt.gameObject.SetActive(true);
+
+        if (SoundEffectManager.instance != null && promptAppearSound != null)
+        {
+            SoundEffectManager.instance.PromptSound(promptAppearSound);
+        }
 
         Vector3 startPosition = GetPromptScreenPosition() + new Vector3(0f, -20f, 0f);
         Vector3 endPosition = GetPromptScreenPosition();

@@ -13,11 +13,21 @@ public class Energy : MonoBehaviour
     public bool absorbFoodUnlocked = false;
     public float absorbRange = 3f;
 
+    [Header("Food Absorption Tuning")]
+    public float absorbTickInterval = 0.12f;
+    public int maxFoodPerTick = 1;
+    public float maxAbsorbRange = 4.5f;
+
     private PlayerHealth playerHealth;
+    private PlayerLevel playerLevel;
+    private PlayerMovement playerMovement;
+    private float absorbTickTimer;
 
     void Start()
     {
         playerHealth = GetComponent<PlayerHealth>();
+        playerLevel = GetComponent<PlayerLevel>();
+        playerMovement = GetComponent<PlayerMovement>();
     }
 
     void Update()
@@ -51,32 +61,70 @@ public class Energy : MonoBehaviour
         absorbFoodUnlocked = true;
         Debug.Log("Food absorption ability unlocked!");
 
-        if (absorbRange < 4.5f)
+        if (absorbRange < 3.5f)
         {
-            absorbRange = 4.5f;
+            absorbRange = 3.5f;
         }
     }
 
     public void ImproveFoodAbsorb(float rangeIncrease)
     {
         absorbFoodUnlocked = true;
-        absorbRange += rangeIncrease;
+        absorbRange = Mathf.Min(maxAbsorbRange, absorbRange + rangeIncrease);
         Debug.Log("Food absorption improved! Range: " + absorbRange);
     }
 
     void AbsorbNearbyFood()
     {
+        if (absorbTickInterval > 0f)
+        {
+            absorbTickTimer -= Time.deltaTime;
+            if (absorbTickTimer > 0f)
+                return;
+
+            absorbTickTimer = absorbTickInterval;
+        }
+
         Collider[] food = Physics.OverlapSphere(transform.position, absorbRange);
+        int absorbedThisTick = 0;
 
         foreach (Collider c in food)
         {
-            if (c.CompareTag("Food"))
+            if (!c.CompareTag("Food"))
+                continue;
+
+            Food foodComponent = c.GetComponentInParent<Food>();
+            if (foodComponent == null)
+                continue;
+
+            AddEnergy(foodComponent.energyValue);
+
+            if (playerHealth != null)
             {
-                Destroy(c.gameObject);
-                AddEnergy(5f);
-                if (playerHealth != null)
-                    playerHealth.Heal(5f);
+                float healAmount = playerHealth.healthFromFood > 0f ? playerHealth.healthFromFood : foodComponent.energyValue;
+                playerHealth.Heal(healAmount);
             }
+
+            if (playerLevel != null)
+            {
+                playerLevel.AddFood(foodComponent.xpvalue);
+            }
+
+            if (playerMovement != null)
+            {
+                playerMovement.AddSizeMultiplier(foodComponent.sizeIncrease);
+            }
+
+            if (SoundEffectManager.instance != null)
+            {
+                SoundEffectManager.instance.FoodEatenSound();
+            }
+
+            Destroy(foodComponent.gameObject);
+
+            absorbedThisTick++;
+            if (absorbedThisTick >= Mathf.Max(1, maxFoodPerTick))
+                break;
         }
     }
 }

@@ -1,9 +1,12 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class EvolutionChoiceTooltip : MonoBehaviour
 {
+    const int TooltipSortingOrder = 5000;
+
     [Header("UI References")]
     public RectTransform tooltipRoot;
     public TextMeshProUGUI titleText;
@@ -11,14 +14,14 @@ public class EvolutionChoiceTooltip : MonoBehaviour
     public TextMeshProUGUI statsText;
 
     [Header("Follow Cursor")]
-    public Vector2 screenOffset = new Vector2(18f, -18f);
+    public Vector2 screenOffset = Vector2.zero;
 
     [Header("Text Colors")]
     public Color statsColor = Color.green;
     public Color negativeStatsColor = Color.red;
 
     private Canvas parentCanvas;
-    private RectTransform canvasRect;
+    private Canvas tooltipCanvas;
     private Camera uiCamera;
     private bool isVisible;
 
@@ -29,6 +32,18 @@ public class EvolutionChoiceTooltip : MonoBehaviour
             tooltipRoot = transform as RectTransform;
         }
 
+        tooltipCanvas = GetComponent<Canvas>();
+        if (tooltipCanvas == null && tooltipRoot != null)
+        {
+            tooltipCanvas = tooltipRoot.gameObject.AddComponent<Canvas>();
+        }
+
+        if (tooltipCanvas != null)
+        {
+            tooltipCanvas.overrideSorting = true;
+            tooltipCanvas.sortingOrder = TooltipSortingOrder;
+        }
+
         CanvasGroup group = GetComponent<CanvasGroup>();
         if (group != null)
         {
@@ -36,10 +51,20 @@ public class EvolutionChoiceTooltip : MonoBehaviour
             group.interactable = false;
         }
 
-        parentCanvas = GetComponentInParent<Canvas>();
+        Graphic[] graphics = GetComponentsInChildren<Graphic>(true);
+        for (int i = 0; i < graphics.Length; i++)
+        {
+            if (graphics[i] != null)
+            {
+                graphics[i].raycastTarget = false;
+            }
+        }
+
+        parentCanvas = tooltipRoot != null && tooltipRoot.parent != null
+            ? tooltipRoot.parent.GetComponentInParent<Canvas>()
+            : null;
         if (parentCanvas != null)
         {
-            canvasRect = parentCanvas.GetComponent<RectTransform>();
             uiCamera = parentCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : parentCanvas.worldCamera;
         }
 
@@ -71,7 +96,16 @@ public class EvolutionChoiceTooltip : MonoBehaviour
         isVisible = true;
 
         if (tooltipRoot != null)
+        {
             tooltipRoot.gameObject.SetActive(true);
+            tooltipRoot.SetAsLastSibling();
+        }
+
+        if (tooltipCanvas != null)
+        {
+            tooltipCanvas.overrideSorting = true;
+            tooltipCanvas.sortingOrder = TooltipSortingOrder;
+        }
 
         FollowCursor();
     }
@@ -101,31 +135,16 @@ public class EvolutionChoiceTooltip : MonoBehaviour
 
         Vector2 screenPosition = (Vector2)mousePos + screenOffset;
 
-        if (canvasRect == null)
+        if (parentCanvas == null || parentCanvas.renderMode == RenderMode.ScreenSpaceOverlay)
         {
-            if (tooltipRoot != null)
-                tooltipRoot.position = screenPosition;
+            tooltipRoot.position = screenPosition;
             return;
         }
 
-        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, screenPosition, uiCamera, out Vector2 localPoint))
-            return;
-
-        Vector2 size = tooltipRoot.rect.size;
-        Vector2 pivot = tooltipRoot.pivot;
-
-        float halfWidth = canvasRect.rect.width * 0.5f;
-        float halfHeight = canvasRect.rect.height * 0.5f;
-
-        float minX = -halfWidth + (size.x * pivot.x);
-        float maxX = halfWidth - (size.x * (1f - pivot.x));
-        float minY = -halfHeight + (size.y * pivot.y);
-        float maxY = halfHeight - (size.y * (1f - pivot.y));
-
-        localPoint.x = Mathf.Clamp(localPoint.x, minX, maxX);
-        localPoint.y = Mathf.Clamp(localPoint.y, minY, maxY);
-
-        tooltipRoot.anchoredPosition = localPoint;
+        if (RectTransformUtility.ScreenPointToWorldPointInRectangle(parentCanvas.transform as RectTransform, screenPosition, uiCamera, out Vector3 worldPoint))
+        {
+            tooltipRoot.position = worldPoint;
+        }
     }
 
     bool IsNegativeStat(string optionStats)

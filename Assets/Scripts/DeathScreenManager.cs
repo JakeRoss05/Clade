@@ -3,6 +3,8 @@ using UnityEngine.SceneManagement;
 
 public class DeathScreenManager : MonoBehaviour
 {
+    const string MainMenuSceneName = "MainMenu";
+
     public GameObject deathScreenPanel;
     private TypewriterEffect typewriterEffect;
 
@@ -40,7 +42,7 @@ public class DeathScreenManager : MonoBehaviour
     {
         // Resume time before loading scene
         Time.timeScale = 1f;
-        SceneManager.LoadScene(0); // Assuming MainMenu is scene 0
+        SceneManager.LoadScene(MainMenuSceneName);
     }
 
     public void QuitGame()
